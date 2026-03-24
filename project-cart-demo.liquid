@@ -1,0 +1,231 @@
+<!-- project-cart-snippet.liquid -->
+<div class="project-cart-container" style="padding: 25px; background: #ffffff; border: 1px solid #e1e3e5; border-radius: 12px; margin: 30px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.05); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <h3 style="margin-top: 0; color: #202223; font-size: 22px; border-bottom: 2px solid #008060; padding-bottom: 12px; display: inline-block;">Project Selection</h3>
+  
+  <!-- Step 1: Project Choice -->
+  <div class="project-section" style="margin-top: 20px;">
+    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
+      <div style="flex: 2; min-width: 250px;">
+        <label style="display: block; font-size: 13px; font-weight: 600; color: #6d7175; margin-bottom: 5px;">SELECT EXISTING PROJECT</label>
+        <select id="storefront-project-selector" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #c9cccf;">
+          <option value="">Loading projects...</option>
+        </select>
+      </div>
+      <div style="flex: 1; min-width: 250px;">
+        <label style="display: block; font-size: 13px; font-weight: 600; color: #6d7175; margin-bottom: 5px;">OR CREATE NEW PROJECT</label>
+        <div style="display: flex; gap: 5px;">
+          <input type="text" id="new-project-name" placeholder="Project Name" style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #c9cccf;">
+          <button id="create-project-btn" style="padding: 10px 15px; background: #008060; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Create</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr style="border: none; border-top: 1px solid #f1f2f3; margin: 25px 0;">
+
+  <!-- Step 2: Product List (only active when project selected) -->
+  <div id="product-list-container" style="opacity: 0.5; pointer-events: none; transition: opacity 0.3s;">
+    <h3 style="margin-top: 0; color: #202223; font-size: 18px; margin-bottom: 15px;">Add Products to <span id="current-project-name" style="color: #008060;">Selected Project</span></h3>
+    <ul style="list-style: none; padding: 0; margin: 0;">
+      {% for product in collections.all.products limit: 5 %}
+        <li style="display: flex; align-items: center; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #f1f2f3;">
+          <div style="display: flex; align-items: center; gap: 15px;">
+            {% if product.featured_image %}
+              <img src="{{ product.featured_image | img_url: '60x60' }}" style="border-radius: 6px; border: 1px solid #ebebeb;">
+            {% endif %}
+            <div>
+              <div style="font-weight: 600; color: #202223;">{{ product.title }}</div>
+              <select id="variant-{{ product.id }}" style="margin-top: 5px; padding: 4px; border-radius: 4px; border: 1px solid #dee1e3; font-size: 13px;">
+                {% for variant in product.variants %}
+                  <option value="{{ variant.id }}">{{ variant.title }} - {{ variant.price | money }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <button class="add-to-both-btn" 
+                  data-product-id="{{ product.id }}" 
+                  style="padding: 10px 15px; background: #008060; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+            Add to Both
+          </button>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div id="project-message" style="margin-top: 20px; padding: 12px; display: none; border-radius: 8px; font-weight: 500; text-align: center;"></div>
+</div>
+
+<script>
+(function() {
+  const APP_URL = "http://localhost:59272"; 
+  const selector = document.getElementById('storefront-project-selector');
+  const createBtn = document.getElementById('create-project-btn');
+  const newNameInput = document.getElementById('new-project-name');
+  const productListContainer = document.getElementById('product-list-container');
+  const currentProjectName = document.getElementById('current-project-name');
+  const messageEl = document.getElementById('project-message');
+
+  const CURRENT_CUSTOMER_EMAIL = "{{ customer.email | default: '' }}";
+
+  // Initialization
+  async function loadProjects(selectId = null) {
+    try {
+      const response = await fetch(`${APP_URL}/api/public/projects`);
+      const data = await response.json();
+      
+      selector.innerHTML = '<option value="">-- Choose Project --</option>';
+      data.projects.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = p.name;
+        if (selectId && p.id === selectId) opt.selected = true;
+        selector.appendChild(opt);
+      });
+      
+      if (selectId) handleProjectChange(selectId, data.projects.find(p => p.id === selectId)?.name);
+    } catch (err) {
+      selector.innerHTML = '<option value="">Failed to load</option>';
+    }
+  }
+
+  // Project Change Logic
+  function handleProjectChange(id, name) {
+    if (id) {
+      productListContainer.style.opacity = "1";
+      productListContainer.style.pointerEvents = "auto";
+      currentProjectName.textContent = name;
+    } else {
+      productListContainer.style.opacity = "0.5";
+      productListContainer.style.pointerEvents = "none";
+      currentProjectName.textContent = "Selected Project";
+    }
+  }
+
+  selector.onchange = (e) => {
+    const id = e.target.value;
+    const name = e.target.options[e.target.selectedIndex].text;
+    handleProjectChange(id, name);
+  };
+
+  // Create Project
+  createBtn.onclick = async () => {
+    const name = newNameInput.value.trim();
+    if (!name) return alert("Please enter a name");
+    
+    createBtn.disabled = true;
+    try {
+      const res = await fetch(`${APP_URL}/api/public/project/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          name,
+          userEmail: CURRENT_CUSTOMER_EMAIL 
+        })
+      });
+      const data = await res.json();
+      if (data.project) {
+        newNameInput.value = "";
+        await loadProjects(data.project.id);
+        showMessage("Project created!", "success");
+      }
+    } catch (err) {
+      showMessage("Failed to create project", "error");
+    } finally {
+      createBtn.disabled = false;
+    }
+  };
+
+  // Add to Both Logic
+  async function handleAdd(variantId, btn) {
+    const projectId = selector.value;
+    const projectText = selector.options[selector.selectedIndex].text;
+    
+    if (!projectId) {
+      showMessage("Please select a project first!", "error");
+      return;
+    }
+
+    btn.disabled = true;
+    const originalText = btn.textContent;
+    btn.textContent = "Adding...";
+
+    console.log(`Starting Add to Both for Variant: ${variantId}, Project: ${projectId}`);
+
+    try {
+      // 1. App Backend
+      console.log("Adding to App Backend...");
+      const p1 = fetch(`${APP_URL}/api/item/add`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          projectId: projectId,
+          variantId: `gid://shopify/ProductVariant/${variantId}`,
+          quantity: 1,
+          addedBy: "Storefront",
+          userEmail: CURRENT_CUSTOMER_EMAIL
+        })
+      });
+
+      // 2. Shopify Cart
+      // Use a more robust root path detection
+      const rootPath = window.Shopify && window.Shopify.routes && window.Shopify.routes.root ? window.Shopify.routes.root : "/";
+      const cartUrl = `${rootPath}cart/add.js`.replace(/\/+$/, '') + "/cart/add.js".replace(/^\//, '');
+      // Fallback if the above is too complex
+      const simpleCartUrl = "/cart/add.js";
+
+      console.log(`Adding to Shopify Cart via ${simpleCartUrl}...`);
+      const p2 = fetch(simpleCartUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: [{
+            id: parseInt(variantId),
+            quantity: 1,
+            properties: { "Project": projectText }
+          }]
+        })
+      });
+
+      const [res1, res2] = await Promise.all([p1, p2]);
+      
+      const data1 = await res1.json();
+      const data2 = await res2.json();
+
+      console.log("App Backend Response:", data1);
+      console.log("Shopify Cart Response:", data2);
+
+      if (res1.ok && res2.ok) {
+        showMessage(`Successfully added to Project & Cart!`, "success");
+        // Trigger Shopify cart update if theme handles it
+        document.dispatchEvent(new CustomEvent('cart:updated'));
+        if (window.Shopify && window.Shopify.onCartUpdate) window.Shopify.onCartUpdate();
+      } else {
+        throw new Error(`Sync failed: Backend ${res1.status}, Cart ${res2.status}`);
+      }
+    } catch (err) {
+      console.error("Critical Sync Error:", err);
+      showMessage(`Error: ${err.message}. Check console for details.`, "error");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
+  }
+
+  function showMessage(msg, type) {
+    messageEl.textContent = msg;
+    messageEl.style.display = "block";
+    messageEl.style.background = type === "success" ? "#e6f4ea" : "#fce8e6";
+    messageEl.style.color = type === "success" ? "#137333" : "#c5221f";
+    setTimeout(() => { messageEl.style.display = "none"; }, 4000);
+  }
+
+  document.querySelectorAll('.add-to-both-btn').forEach(btn => {
+    btn.onclick = function() {
+      const vid = document.getElementById(`variant-${this.getAttribute('data-product-id')}`).value;
+      handleAdd(vid, this);
+    };
+  });
+
+  loadProjects();
+})();
+</script>

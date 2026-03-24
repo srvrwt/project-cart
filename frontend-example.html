@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project List Frontend</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            padding: 20px;
+            background: #f4f6f8;
+            color: #202223;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        h1,
+        h2 {
+            margin-top: 0;
+            color: #1a1c1d;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ebebeb;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            padding: 15px;
+            border-bottom: 1px solid #f1f2f3;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        li:hover {
+            background: #f9fafb;
+        }
+
+        li:last-child {
+            border-bottom: none;
+        }
+
+        .project-name {
+            font-weight: 600;
+            color: #008060;
+            font-size: 16px;
+        }
+
+        .date {
+            font-size: 12px;
+            color: #6d7175;
+        }
+
+        .error {
+            color: #d72c0d;
+            background: #fff4f4;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            border: 1px solid #fdada1;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        select,
+        input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #c9cccf;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: #008060;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #006e52;
+        }
+
+        button:disabled {
+            background: #c9cccf;
+            cursor: not-allowed;
+        }
+
+        .item-list {
+            margin-top: 15px;
+            background: #fdfdfd;
+            border: 1px solid #f1f2f3;
+            border-radius: 6px;
+        }
+
+        .item-row {
+            padding: 10px 15px;
+            border-bottom: 1px solid #f1f2f3;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+
+        .item-row:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="section">
+            <h1>Project Cart Demo</h1>
+            <p>Select a project and add items to it from the frontend.</p>
+        </div>
+
+        <div id="error-message" class="error" style="display: none;"></div>
+
+        <div class="section">
+            <h2>1. Select Project</h2>
+            <div class="form-group">
+                <select id="project-selector">
+                    <option value="">Loading projects...</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="section" id="add-item-section" style="display: none;">
+            <h2>2. Add Item to <span id="selected-project-name">...</span></h2>
+            <div class="form-group">
+                <label>Variant ID (Shopify GID)</label>
+                <input type="text" id="variant-id" placeholder="gid://shopify/ProductVariant/123456789">
+                <p style="font-size: 11px; color: #6d7175; margin-top: 4px;">Example:
+                    gid://shopify/ProductVariant/47265979269417 (Check your store's variants)</p>
+            </div>
+            <div class="form-group">
+                <label>Quantity</label>
+                <input type="number" id="quantity" value="1" min="1">
+            </div>
+            <div class="form-group">
+                <label>Area (Optional)</label>
+                <input type="text" id="area" placeholder="Kitchen, Bedroom, etc.">
+            </div>
+            <button id="add-item-btn">Add to Project</button>
+        </div>
+
+        <div class="section" id="items-section" style="display: none;">
+            <h2>Items in Project</h2>
+            <div id="items-container" class="item-list">
+                <!-- Items will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update this to match your app's base URL (e.g., the tunnel URL from shopify app dev)
+        const BASE_URL = window.location.origin === "null" ? "http://localhost:59272" : "";
+        const API_URLS = {
+            listProjects: `${BASE_URL}/api/public/projects`,
+            addItems: `${BASE_URL}/api/item/add`,
+            listItems: `${BASE_URL}/api/item/list`,
+            removeItems: `${BASE_URL}/api/item/remove`
+        };
+
+        const projectSelector = document.getElementById("project-selector");
+        const addItemSection = document.getElementById("add-item-section");
+        const itemsSection = document.getElementById("items-section");
+        const selectedProjectName = document.getElementById("selected-project-name");
+        const itemsContainer = document.getElementById("items-container");
+        const errorMsg = document.getElementById("error-message");
+
+        let allProjects = [];
+
+        async function fetchProjects() {
+            try {
+                const response = await fetch(API_URLS.listProjects);
+                if (!response.ok) throw new Error("Failed to fetch projects");
+
+                const data = await response.json();
+                allProjects = data.projects;
+
+                projectSelector.innerHTML = '<option value="">-- Choose a Project --</option>';
+                allProjects.forEach(project => {
+                    const opt = document.createElement("option");
+                    opt.value = project.id;
+                    opt.textContent = project.name;
+                    projectSelector.appendChild(opt);
+                });
+            } catch (error) {
+                showError("Error fetching projects: " + error.message);
+            }
+        }
+
+        async function fetchItems(projectId) {
+            try {
+                const response = await fetch(`${API_URLS.listItems}?projectId=${projectId}`);
+                if (!response.ok) throw new Error("Failed to fetch items");
+
+                const data = await response.json();
+                renderItems(data.items);
+            } catch (error) {
+                showError("Error fetching items: " + error.message);
+            }
+        }
+
+        function renderItems(items) {
+            itemsContainer.innerHTML = "";
+            if (items.length === 0) {
+                itemsContainer.innerHTML = '<div class="item-row">No items found.</div>';
+                return;
+            }
+
+            items.forEach(item => {
+                const div = document.createElement("div");
+                div.className = "item-row";
+                div.innerHTML = `
+                    <span>
+                        <strong>Variant:</strong> ${item.variantId.split('/').pop()} 
+                        <span style="color: #6d7175">(${item.area || 'No Area'})</span>
+                    </span>
+                    <span>
+                        Qty: ${item.quantity} 
+                        <button onclick="removeItem('${item.id}')" style="padding: 2px 8px; margin-left: 10px; background: #d72c0d; font-size: 11px;">Remove</button>
+                    </span>
+                `;
+                itemsContainer.appendChild(div);
+            });
+        }
+
+        async function addItem() {
+            const projectId = projectSelector.value;
+            const variantId = document.getElementById("variant-id").value;
+            const quantity = document.getElementById("quantity").value;
+            const area = document.getElementById("area").value;
+
+            if (!variantId) {
+                alert("Please enter a Variant ID");
+                return;
+            }
+
+            try {
+                const response = await fetch(API_URLS.addItems, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ projectId, variantId, quantity, area })
+                });
+
+                if (!response.ok) throw new Error("Failed to add item");
+
+                // Clear form and refresh items
+                document.getElementById("variant-id").value = "";
+                document.getElementById("area").value = "";
+                await fetchItems(projectId);
+                alert("Item added successfully!");
+            } catch (error) {
+                showError("Error adding item: " + error.message);
+            }
+        }
+
+        async function removeItem(itemId) {
+            if (!confirm("Remove this item?")) return;
+
+            try {
+                const response = await fetch(API_URLS.removeItems, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ itemId })
+                });
+
+                if (!response.ok) throw new Error("Failed to remove item");
+                await fetchItems(projectSelector.value);
+            } catch (error) {
+                showError("Error removing item: " + error.message);
+            }
+        }
+
+        function showError(msg) {
+            errorMsg.textContent = msg;
+            errorMsg.style.display = "block";
+            setTimeout(() => { errorMsg.style.display = "none"; }, 5000);
+        }
+
+        projectSelector.onchange = (e) => {
+            const projectId = e.target.value;
+            if (projectId) {
+                const project = allProjects.find(p => p.id === projectId);
+                selectedProjectName.textContent = project.name;
+                addItemSection.style.display = "block";
+                itemsSection.style.display = "block";
+                fetchItems(projectId);
+            } else {
+                addItemSection.style.display = "none";
+                itemsSection.style.display = "none";
+            }
+        };
+
+        document.getElementById("add-item-btn").onclick = addItem;
+
+        fetchProjects();
+    </script>
+</body>
+
+</html>
