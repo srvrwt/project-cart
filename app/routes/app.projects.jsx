@@ -88,7 +88,7 @@ export default function ProjectsPage() {
                                     fontSize: '14px'
                                 }}
                             />
-                            <s-button onClick={handleAdd} {...(isLoading && !editId ? { loading: true } : {})}>Create Project</s-button>
+                            <s-button icon="plus" onClick={handleAdd} {...(isLoading && !editId ? { loading: true } : {})}>Create Project</s-button>
                         </s-stack>
                     </s-box>
 

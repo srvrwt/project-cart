@@ -36,9 +36,12 @@ model Project {
   id        String   @id @default(cuid())
   name      String
   userId    String?  // Store customer email
+  source    String   @default("Admin") // "Admin" or "Website"
   createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
   items     Item[]
+  logs      ProjectLog[]
 }
 
 model Item {
@@ -50,4 +53,16 @@ model Item {
   addedBy   String?   // ✅ user
 
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model ProjectLog {
+  id        String   @id @default(cuid())
+  projectId String
+  action    String   // e.g. "CREATED", "UPDATED", "ITEM_ADDED"
+  details   String?  // extra info
+  userId    String?  // who did it
+  source    String   // "Admin" or "Website"
+  createdAt DateTime @default(now())
+
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
