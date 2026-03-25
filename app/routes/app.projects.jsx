@@ -72,7 +72,6 @@ export default function ProjectsPage() {
 
     return (
         <s-page heading="Projects">
-
             <s-section heading="All Projects">
                 <s-stack direction="block" gap="base">
                     <s-box padding="base" borderWidth="base" borderRadius="base" background="subdued">
@@ -138,7 +137,7 @@ export default function ProjectsPage() {
                                                 {p.totalQty || 0}
                                             </td>
                                             <td style={{ textAlign: 'right', padding: '12px 16px' }}>
-                                                <s-stack direction="inline" gap="tight" align="center">
+                                                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
                                                     {editId === p.id ? (
                                                         <>
                                                             <s-button variant="primary" onClick={handleUpdate} {...(isLoading ? { loading: true } : {})}>Save</s-button>
@@ -150,7 +149,7 @@ export default function ProjectsPage() {
                                                             <s-button variant="tertiary" onClick={() => handleDelete(p.id)} tone="critical">Delete</s-button>
                                                         </>
                                                     )}
-                                                </s-stack>
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}

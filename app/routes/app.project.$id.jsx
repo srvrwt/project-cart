@@ -232,7 +232,7 @@ export default function ProjectPage() {
                                                             </div>
                                                         </td>
                                                         <td style={{ padding: '12px 16px', fontSize: '13px' }}>
-                                                            <div style={{ color: '#008060', fontWeight: '500' }}>
+                                                            <div>
                                                                 {item.areaList.map((area, i) => (
                                                                     <div key={i}>{area}</div>
                                                                 ))}
@@ -251,7 +251,7 @@ export default function ProjectPage() {
                                     </tbody>
                                     <tfoot>
                                         <tr style={{ background: '#f6f6f7', fontWeight: 'bold', borderTop: '2px solid #e1e3e5' }}>
-                                            <td colSpan="2" style={{ padding: '16px', textAlign: 'right', fontSize: '16px' }}>TOTALS:</td>
+                                            <td colSpan="2" style={{ padding: '16px', textAlign: 'right', fontSize: '16px' }}>TOTAL:</td>
                                             <td style={{ textAlign: 'right', padding: '16px', fontSize: '16px', color: '#008060' }}>{totalQty}</td>
                                             <td style={{ textAlign: 'right', padding: '16px', fontSize: '16px', color: '#008060' }}>${totalPrice.toFixed(2)}</td>
                                         </tr>
