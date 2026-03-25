@@ -114,11 +114,12 @@ export default function ProjectsPage() {
                                                         onInput={(e) => setEditName(e.target.value)}
                                                     ></s-text-field>
                                                 ) : (
-                                                    <>
-
+                                                    <s-button
+                                                        variant="plain"
+                                                        onClick={() => navigate(`/app/project/${p.id}`)}
+                                                    >
                                                         {p.name}
-                                                    </>
-
+                                                    </s-button>
                                                 )}
                                             </s-table-cell>
 
@@ -164,13 +165,6 @@ export default function ProjectsPage() {
                                                 ) : (
                                                     <>
                                                         <s-button-group>
-                                                            <s-button
-                                                                onClick={() => navigate(`/app/project/${p.id}`)}
-                                                                icon="view"
-                                                            >
-                                                                View
-                                                            </s-button>
-
                                                             <s-button
                                                                 onClick={() => {
                                                                     setEditId(p.id);
