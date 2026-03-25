@@ -73,7 +73,7 @@ export default function ProjectsPage() {
     return (
         <s-page heading="Projects">
             <s-section heading="All Projects">
-                <s-stack direction="block" gap="base">
+                <s-stack direction="inline" gap="base">
                     <s-box padding="base" borderWidth="base" borderRadius="base" background="subdued">
                         <s-stack direction="inline" gap="base" align="center">
                             <s-text-field
@@ -114,12 +114,8 @@ export default function ProjectsPage() {
                                                         onInput={(e) => setEditName(e.target.value)}
                                                     ></s-text-field>
                                                 ) : (
-                                                    <s-button
-                                                        variant="plain"
-                                                        onClick={() => navigate(`/app/project/${p.id}`)}
-                                                    >
-                                                        {p.name}
-                                                    </s-button>
+
+                                                    { p.name }
                                                 )}
                                             </s-table-cell>
 
@@ -144,40 +140,52 @@ export default function ProjectsPage() {
                                             <s-table-cell>
                                                 {editId === p.id ? (
                                                     <>
-                                                        <s-button
-                                                            variant="primary"
-                                                            onClick={handleUpdate}
-                                                            {...(isLoading ? { loading: true } : {})}
-                                                        >
-                                                            Save
-                                                        </s-button>
+                                                        <s-button-group>
 
-                                                        <s-button
-                                                            variant="tertiary"
-                                                            onClick={() => setEditId(null)}
-                                                        >
-                                                            Cancel
-                                                        </s-button>
+                                                            <s-button
+                                                                variant="primary"
+                                                                onClick={handleUpdate}
+                                                                {...(isLoading ? { loading: true } : {})}
+                                                            >
+                                                                Save
+                                                            </s-button>
+
+                                                            <s-button
+                                                                variant="tertiary"
+                                                                onClick={() => setEditId(null)}
+                                                            >
+                                                                Cancel
+                                                            </s-button>
+                                                        </s-button-group>
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <s-button
-                                                            onClick={() => {
-                                                                setEditId(p.id);
-                                                                setEditName(p.name);
-                                                            }}
-                                                            icon="edit"
-                                                        >
-                                                            Edit
-                                                        </s-button>
+                                                        <s-button-group>
+                                                            <s-button
+                                                                onClick={() => {
+                                                                    setEditId(p.id);
+                                                                    setEditName(p.name);
+                                                                }}
+                                                                icon="edit"
+                                                            >
+                                                                Edit
+                                                            </s-button>
 
-                                                        <s-button
-                                                            tone="critical"
-                                                            onClick={() => handleDelete(p.id)}
-                                                            icon="delete"
-                                                        >
-                                                            Delete
-                                                        </s-button>
+                                                            <s-button
+                                                                onClick={() => navigate(`/app/project/${p.id}`)}
+                                                                icon="view"
+                                                            >
+                                                                View
+                                                            </s-button>
+
+                                                            <s-button
+                                                                tone="critical"
+                                                                onClick={() => handleDelete(p.id)}
+                                                                icon="delete"
+                                                            >
+                                                                Delete
+                                                            </s-button>
+                                                        </s-button-group>
                                                     </>
                                                 )}
                                             </s-table-cell>
