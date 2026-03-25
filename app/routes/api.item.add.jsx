@@ -21,8 +21,6 @@ export async function action({ request }) {
 
     try {
         const body = await request.json();
-        
-        // Extract with fallbacks for different casings/names
         const projectId = body.projectId || body.project_id;
         const variantId = body.variantId || body.variant_id;
         const quantity = body.quantity || body.qty || 1;
@@ -41,7 +39,7 @@ export async function action({ request }) {
         if (!projectId || !variantId) {
             return new Response(JSON.stringify({ error: "projectId and variantId are required" }), {
                 status: 400,
-                headers: { 
+                headers: {
                     "Content-Type": "application/json",
                     "Access-Control-Allow-Origin": "*",
                 },
@@ -53,7 +51,7 @@ export async function action({ request }) {
             await prisma.project.update({
                 where: { id: projectId },
                 data: { userId: String(userEmail) }
-            }).catch(() => {});
+            }).catch(() => { });
         }
 
         const newItem = await prisma.item.create({
@@ -67,7 +65,7 @@ export async function action({ request }) {
         });
 
         return new Response(JSON.stringify({ item: newItem }), {
-            headers: { 
+            headers: {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*",
             },
@@ -76,7 +74,7 @@ export async function action({ request }) {
         console.error("Error adding item:", error);
         return new Response(JSON.stringify({ error: error.message }), {
             status: 500,
-            headers: { 
+            headers: {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*",
             },
