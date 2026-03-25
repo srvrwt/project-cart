@@ -16,54 +16,70 @@ export const loader = async ({ request, params }) => {
     }
 
     // Fetch product details for each variantId
-    const variantIds = [...new Set(project.items.map(item => item.variantId))];
+    const variantIds = [...new Set(project.items.map(item => {
+        const vid = String(item.variantId);
+        return vid.startsWith("gid://") ? vid : `gid://shopify/ProductVariant/${vid}`;
+    }))];
 
     if (variantIds.length === 0) {
         return { project, itemsWithDetails: [] };
     }
 
-    // GraphQL query to fetch multiple variants
-    const response = await admin.graphql(
-        `#graphql
-        query getVariants($ids: [ID!]!) {
-          nodes(ids: $ids) {
-            ... on ProductVariant {
-              id
-              title
-              price
-              image {
-                url
-                altText
-              }
-              product {
-                title
-                featuredImage {
-                  url
-                  altText
+    try {
+        // GraphQL query to fetch multiple variants
+        const response = await admin.graphql(
+            `#graphql
+            query getVariants($ids: [ID!]!) {
+              nodes(ids: $ids) {
+                ... on ProductVariant {
+                  id
+                  title
+                  price
+                  image {
+                    url
+                    altText
+                  }
+                  product {
+                    title
+                    featuredImage {
+                      url
+                      altText
+                    }
+                  }
                 }
               }
+            }`,
+            {
+                variables: {
+                    ids: variantIds,
+                },
             }
-          }
-        }`,
-        {
-            variables: {
-                ids: variantIds,
-            },
-        }
-    );
+        );
 
-    const data = await response.json();
-    const variantNodes = data.data.nodes || [];
+        const data = await response.json();
+        const variantNodes = data?.data?.nodes || [];
 
-    // Map variant details back to project items
-    const itemsWithDetails = project.items.map(item => {
-        const variant = variantNodes.find(v => v && v.id === item.variantId);
+        // Map variant details back to project items
+        const itemsWithDetails = project.items.map(item => {
+            const itemVid = String(item.variantId).startsWith("gid://")
+                ? item.variantId
+                : `gid://shopify/ProductVariant/${item.variantId}`;
+
+            const variant = variantNodes.find(v => v && v.id === itemVid);
+            return {
+                ...item,
+                variantDetails: variant || null
+            };
+        });
+        return { project, itemsWithDetails };
+    } catch (error) {
+        console.error("Error fetching variant details:", error);
+        // Return project with items but no variant details as fallback
         return {
-            ...item,
-            variantDetails: variant || null
+            project,
+            itemsWithDetails: project.items.map(item => ({ ...item, variantDetails: null }))
         };
-    });
-    return { project, itemsWithDetails };
+    }
 };
 
 export default function ProjectPage() {

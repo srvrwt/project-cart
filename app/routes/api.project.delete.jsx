@@ -1,20 +1,77 @@
 import prisma from "../db.server";
 
 export async function action({ request }) {
-    const body = await request.json();
-    const { id } = body;
-
-    if (!id) {
-        return new Response(JSON.stringify({ error: "ID required" }), {
-            status: 400,
+    // ── CORS preflight ──
+    if (request.method === "OPTIONS") {
+        return new Response(null, {
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "POST, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type",
+            },
         });
     }
 
-    await prisma.project.delete({
-        where: { id }
-    });
+    if (request.method !== "POST") {
+        return new Response(JSON.stringify({ error: "Method not allowed" }), {
+            status: 405,
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+            },
+        });
+    }
 
-    return new Response(JSON.stringify({ success: true }), {
-        headers: { "Content-Type": "application/json" },
+    try {
+        const body = await request.json();
+        const { id } = body;
+
+        if (!id) {
+            return new Response(JSON.stringify({ error: "ID required" }), {
+                status: 400,
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                },
+            });
+        }
+
+        // ── Delete all items belonging to this project first ──
+        await prisma.item.deleteMany({
+            where: { projectId: id }
+        });
+
+        // ── Then delete the project itself ──
+        await prisma.project.delete({
+            where: { id }
+        });
+
+        return new Response(JSON.stringify({ success: true }), {
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+            },
+        });
+
+    } catch (error) {
+        console.error("Error deleting project:", error);
+        return new Response(JSON.stringify({ error: error.message }), {
+            status: 500,
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+            },
+        });
+    }
+}
+
+// ── CORS preflight loader ──
+export async function loader() {
+    return new Response(null, {
+        headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type",
+        },
     });
 }
