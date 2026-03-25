@@ -23,7 +23,7 @@ export async function action({ request }) {
 
     try {
         const body = await request.json();
-        const { itemId, projectId, variantId } = body;
+        const { itemId, projectId, variantId, area } = body;
 
         // ── Path 1: direct itemId (existing admin usage) ──
         if (itemId) {
@@ -40,17 +40,23 @@ export async function action({ request }) {
         if (projectId && variantId) {
             const cleanVariantId = String(variantId).replace("gid://shopify/ProductVariant/", "");
 
-            await prisma.item.deleteMany({
-                where: {
-                    projectId,
-                    variantId: {
-                        in: [
-                            cleanVariantId,
-                            `gid://shopify/ProductVariant/${cleanVariantId}`
-                        ]
-                    }
+            // Build where clause
+            const where = {
+                projectId,
+                variantId: {
+                    in: [
+                        cleanVariantId,
+                        `gid://shopify/ProductVariant/${cleanVariantId}`
+                    ]
                 }
-            });
+            };
+
+            // If area is provided, use it to narrow down
+            if (area) {
+                where.area = area;
+            }
+
+            await prisma.item.deleteMany({ where });
 
             return new Response(JSON.stringify({ success: true }), {
                 headers: {
