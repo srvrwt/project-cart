@@ -7,7 +7,6 @@ export async function action({ request }) {
     // An offline token has the shop name, while an online token can also have the user's email or name.
     let adminUser = session.email || `${session.firstName || ''} ${session.lastName || ''}`.trim();
 
-    // If there is no email in the session (e.g. offline tokens), fetch the store email via GraphQL
     if (!adminUser && admin) {
         try {
             const response = await admin.graphql(
