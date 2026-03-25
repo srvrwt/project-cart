@@ -73,7 +73,7 @@ export default function ProjectsPage() {
     return (
         <s-page heading="Projects">
             <s-section heading="All Projects">
-                <s-stack direction="inline" gap="base">
+                <s-stack direction="block" gap="base">
                     <s-box padding="base" borderWidth="base" borderRadius="base" background="subdued">
                         <s-stack direction="inline" gap="base" align="center">
                             <s-text-field
@@ -92,107 +92,63 @@ export default function ProjectsPage() {
                         </s-box>
                     ) : (
                         <s-box borderWidth="base" borderRadius="base">
-                            <s-table>
-
-                                <s-table-header-row>
-                                    <s-table-header listSlot="primary">Project Name</s-table-header>
-                                    <s-table-header listSlot="inline">User ID</s-table-header>
-                                    <s-table-header listSlot="inline">Created</s-table-header>
-                                    <s-table-header listSlot="labeled">Products</s-table-header>
-                                    <s-table-header listSlot="labeled">Actions</s-table-header>
-                                </s-table-header-row>
-
-                                <s-table-body>
+                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                <thead>
+                                    <tr style={{ background: '#f6f6f7', borderBottom: '1px solid #e1e3e5' }}>
+                                        <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: 'bold' }}>Project Name</th>
+                                        <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: 'bold' }}>User ID</th>
+                                        <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: 'bold' }}>Created</th>
+                                        <th style={{ textAlign: 'center', padding: '12px 16px', fontWeight: 'bold' }}>Products</th>
+                                        <th style={{ textAlign: 'right', padding: '12px 16px', fontWeight: 'bold' }}>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
                                     {projects.map((p) => (
-                                        <s-table-row key={p.id}>
-
-                                            {/* Project Name */}
-                                            <s-table-cell>
+                                        <tr key={p.id} style={{ borderBottom: '1px solid #f1f2f3' }}>
+                                            <td style={{ padding: '12px 16px' }}>
                                                 {editId === p.id ? (
-                                                    <s-text-field
+                                                    <input
                                                         value={editName}
-                                                        onInput={(e) => setEditName(e.target.value)}
-                                                    ></s-text-field>
+                                                        onChange={(e) => setEditName(e.target.value)}
+                                                        style={{
+                                                            padding: '4px 8px',
+                                                            borderRadius: '4px',
+                                                            border: '1px solid #c9cccf',
+                                                            width: '80%'
+                                                        }}
+                                                    />
                                                 ) : (
-                                                    <s-button
-                                                        variant="plain"
-                                                        onClick={() => navigate(`/app/project/${p.id}`)}
-                                                    >
-                                                        {p.name}
-                                                    </s-button>
+                                                    <s-link onClick={() => navigate(`/app/project/${p.id}`)}>{p.name}</s-link>
                                                 )}
-                                            </s-table-cell>
-
-                                            {/* User ID */}
-                                            <s-table-cell>
-                                                {p.userId || "N/A"}
-                                            </s-table-cell>
-
-                                            {/* Created */}
-                                            <s-table-cell>
+                                            </td>
+                                            <td style={{ padding: '12px 16px', color: '#6d7175', fontSize: '13px' }}>
+                                                {p.userId || 'N/A'}
+                                            </td>
+                                            <td style={{ padding: '12px 16px', color: '#6d7175', fontSize: '13px' }}>
                                                 {new Date(p.createdAt).toLocaleDateString()}
-                                            </s-table-cell>
-
-                                            {/* Products */}
-                                            <s-table-cell>
-                                                <s-badge tone="success">
-                                                    {p.totalQty || 0}
-                                                </s-badge>
-                                            </s-table-cell>
-
-                                            {/* Actions */}
-                                            <s-table-cell>
-                                                {editId === p.id ? (
-                                                    <>
-                                                        <s-button-group>
-
-                                                            <s-button
-                                                                variant="primary"
-                                                                onClick={handleUpdate}
-                                                                {...(isLoading ? { loading: true } : {})}
-                                                            >
-                                                                Save
-                                                            </s-button>
-
-                                                            <s-button
-                                                                variant="tertiary"
-                                                                onClick={() => setEditId(null)}
-                                                            >
-                                                                Cancel
-                                                            </s-button>
-                                                        </s-button-group>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <s-button-group>
-                                                            <s-button
-                                                                onClick={() => {
-                                                                    setEditId(p.id);
-                                                                    setEditName(p.name);
-                                                                }}
-                                                                icon="edit"
-                                                            >
-                                                                Edit
-                                                            </s-button>
-
-                                                            <s-button
-                                                                tone="critical"
-                                                                onClick={() => handleDelete(p.id)}
-                                                                icon="delete"
-                                                            >
-                                                                Delete
-                                                            </s-button>
-                                                        </s-button-group>
-                                                    </>
-                                                )}
-                                            </s-table-cell>
-
-                                        </s-table-row>
+                                            </td>
+                                            <td style={{ textAlign: 'center', padding: '12px 16px', fontWeight: '600', color: '#008060' }}>
+                                                {p.totalQty || 0}
+                                            </td>
+                                            <td style={{ textAlign: 'right', padding: '12px 16px' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+                                                    {editId === p.id ? (
+                                                        <>
+                                                            <s-button variant="primary" onClick={handleUpdate} {...(isLoading ? { loading: true } : {})}>Save</s-button>
+                                                            <s-button variant="tertiary" onClick={() => setEditId(null)}>Cancel</s-button>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <s-button onClick={() => { setEditId(p.id); setEditName(p.name); }} slot="secondary-actions" icon="edit">Edit</s-button>
+                                                            <s-button onClick={() => handleDelete(p.id)} slot="secondary-actions" icon="delete" tone="critical">Delete</s-button>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
                                     ))}
-                                </s-table-body>
-
-                            </s-table>
-
+                                </tbody>
+                            </table>
                         </s-box>
                     )}
                 </s-stack>
