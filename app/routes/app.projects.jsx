@@ -145,7 +145,7 @@ export default function ProjectsPage() {
                                                         </>
                                                     ) : (
                                                         <>
-                                                            <s-button variant="tertiary" onClick={() => { setEditId(p.id); setEditName(p.name); }} slot="secondary-actions" icon="edit">Edit</s-button>
+                                                            <s-button onClick={() => { setEditId(p.id); setEditName(p.name); }} slot="secondary-actions" icon="edit">Edit</s-button>
                                                             <s-button onClick={() => handleDelete(p.id)} slot="secondary-actions" icon="delete" tone="critical">Delete</s-button>
                                                         </>
                                                     )}
