@@ -1,7 +1,7 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "cd0df489676ed30b71b84e2746103876"
-name = "project-cart"
+name = "Project Cart"
 application_url = "https://example.com"
 embedded = true
 
