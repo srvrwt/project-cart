@@ -1,8 +1,13 @@
 import prisma from "../db.server";
+import { authenticate } from "../shopify.server";
 
 export async function action({ request }) {
-    const body = await request.json();
+    const { session } = await authenticate.admin(request);
+    
+    // An offline token has the shop name, while an online token can also have the user's email or name.
+    const adminUser = session.email || `${session.firstName || ''} ${session.lastName || ''}`.trim() || session.shop;
 
+    const body = await request.json();
     const { name } = body;
 
     if (!name) {
@@ -12,7 +17,10 @@ export async function action({ request }) {
     }
 
     const newProject = await prisma.project.create({
-        data: { name }
+        data: { 
+            name,
+            userId: adminUser // Store the admin identifier
+        }
     });
 
     return new Response(JSON.stringify({ project: newProject }), {
