@@ -159,133 +159,136 @@ export default function ProjectPage() {
                 Back to Projects
             </s-button>
 
-            <s-section direction="block" gap="base">
-                <s-box paddingBlockEnd="400">
-                    <s-stack direction="inline" gap="base">
-                        <s-button
-                            onClick={() => setViewMode("area")}
-                            {...(viewMode === "area" ? { variant: "primary" } : {})}
-                        >
-                            Area View
-                        </s-button>
-                        <s-button
-                            onClick={() => setViewMode("product")}
-                            {...(viewMode === "product" ? { variant: "primary" } : {})}
-                        >
-                            Product View
-                        </s-button>
-                    </s-stack>
-                </s-box>
-
+            <s-section>
                 <s-stack direction="block" gap="base">
-                    {itemsWithDetails.length === 0 ? (
-                        <s-box padding="loose" textAlign="center">
-                            <s-paragraph>No products added to this project yet.</s-paragraph>
-                        </s-box>
-                    ) : (
-                        <s-box borderWidth="base" borderRadius="base">
-                            <s-table>
-                                <s-table-header-row>
-                                    <s-table-header listSlot="primary">Product</s-table-header>
-                                    <s-table-header listSlot="inline">{viewMode === "area" ? "Variant" : "Areas"}</s-table-header>
-                                    <s-table-header listSlot="labeled" alignment="end">Quantity</s-table-header>
-                                    <s-table-header listSlot="labeled" alignment="end">Price</s-table-header>
-                                </s-table-header-row>
 
-                                <s-table-body>
-                                    {viewMode === "area" ? (
-                                        processedItems.map((group) => (
-                                            <React.Fragment key={group.displayTitle}>
-                                                <s-table-row>
-                                                    <s-table-cell tone="success">
-                                                        <s-text fontWeight="bold">Area: {group.displayTitle}</s-text>
-                                                    </s-table-cell>
-                                                    <s-table-cell></s-table-cell>
-                                                    <s-table-cell alignment="end">
-                                                        <s-text fontWeight="bold">{group.totalQty}</s-text>
-                                                    </s-table-cell>
-                                                    <s-table-cell alignment="end">
-                                                        <s-text fontWeight="bold">${group.totalPrice.toFixed(2)}</s-text>
-                                                    </s-table-cell>
-                                                </s-table-row>
-                                                {group.items.map(item => {
-                                                    const imgUrl = item.variantDetails?.image?.url || item.variantDetails?.product?.featuredImage?.url;
-                                                    return (
-                                                        <s-table-row key={item.id}>
-                                                            <s-table-cell>
-                                                                <s-stack direction="inline" gap="base" align="center">
-                                                                    {imgUrl ? (
-                                                                        <img src={imgUrl} style={{ width: '40px', height: '40px', borderRadius: '4px', objectFit: 'cover' }} alt="" />
-                                                                    ) : (
-                                                                        <s-box width="40px" minHeight="40px" background="subdued" borderRadius="base" />
-                                                                    )}
-                                                                    <s-text>{item.variantDetails?.product?.title}</s-text>
+                    <s-box paddingBlockEnd="400">
+                        <s-stack direction="inline" gap="base">
+                            <s-button
+                                onClick={() => setViewMode("area")}
+                                {...(viewMode === "area" ? { variant: "primary" } : {})}
+                            >
+                                Area View
+                            </s-button>
+                            <s-button
+                                onClick={() => setViewMode("product")}
+                                {...(viewMode === "product" ? { variant: "primary" } : {})}
+                            >
+                                Product View
+                            </s-button>
+                        </s-stack>
+                    </s-box>
+
+                    <s-stack direction="block" gap="base">
+                        {itemsWithDetails.length === 0 ? (
+                            <s-box padding="loose" textAlign="center">
+                                <s-paragraph>No products added to this project yet.</s-paragraph>
+                            </s-box>
+                        ) : (
+                            <s-box borderWidth="base" borderRadius="base">
+                                <s-table>
+                                    <s-table-header-row>
+                                        <s-table-header listSlot="primary">Product</s-table-header>
+                                        <s-table-header listSlot="inline">{viewMode === "area" ? "Variant" : "Areas"}</s-table-header>
+                                        <s-table-header listSlot="labeled" alignment="end">Quantity</s-table-header>
+                                        <s-table-header listSlot="labeled" alignment="end">Price</s-table-header>
+                                    </s-table-header-row>
+
+                                    <s-table-body>
+                                        {viewMode === "area" ? (
+                                            processedItems.map((group) => (
+                                                <React.Fragment key={group.displayTitle}>
+                                                    <s-table-row>
+                                                        <s-table-cell tone="success">
+                                                            <s-text fontWeight="bold">Area: {group.displayTitle}</s-text>
+                                                        </s-table-cell>
+                                                        <s-table-cell></s-table-cell>
+                                                        <s-table-cell alignment="end">
+                                                            <s-text fontWeight="bold">{group.totalQty}</s-text>
+                                                        </s-table-cell>
+                                                        <s-table-cell alignment="end">
+                                                            <s-text fontWeight="bold">${group.totalPrice.toFixed(2)}</s-text>
+                                                        </s-table-cell>
+                                                    </s-table-row>
+                                                    {group.items.map(item => {
+                                                        const imgUrl = item.variantDetails?.image?.url || item.variantDetails?.product?.featuredImage?.url;
+                                                        return (
+                                                            <s-table-row key={item.id}>
+                                                                <s-table-cell>
+                                                                    <s-stack direction="inline" gap="base" align="center">
+                                                                        {imgUrl ? (
+                                                                            <img src={imgUrl} style={{ width: '40px', height: '40px', borderRadius: '4px', objectFit: 'cover' }} alt="" />
+                                                                        ) : (
+                                                                            <s-box width="40px" minHeight="40px" background="subdued" borderRadius="base" />
+                                                                        )}
+                                                                        <s-text>{item.variantDetails?.product?.title}</s-text>
+                                                                    </s-stack>
+                                                                </s-table-cell>
+                                                                <s-table-cell>{item.variantDetails?.title}</s-table-cell>
+                                                                <s-table-cell alignment="end">{item.quantity}</s-table-cell>
+                                                                <s-table-cell alignment="end">${(item.quantity * parseFloat(item.variantDetails?.price || 0)).toFixed(2)}</s-table-cell>
+                                                            </s-table-row>
+                                                        );
+                                                    })}
+                                                </React.Fragment>
+                                            ))
+                                        ) : (
+                                            processedItems.map((item) => {
+                                                const details = item.variantDetails;
+                                                const imgUrl = details?.image?.url || details?.product?.featuredImage?.url;
+                                                return (
+                                                    <s-table-row key={item.variantId}>
+                                                        <s-table-cell>
+                                                            <s-stack direction="inline" gap="base" align="center">
+                                                                {imgUrl ? (
+                                                                    <img
+                                                                        src={imgUrl}
+                                                                        alt={details?.image?.altText || details?.product?.featuredImage?.altText || details?.title}
+                                                                        style={{ width: '45px', height: '45px', objectFit: 'cover', borderRadius: '4px' }}
+                                                                    />
+                                                                ) : (
+                                                                    <s-box width="45px" minHeight="45px" background="subdued" borderRadius="base" />
+                                                                )}
+                                                                <s-stack direction="block" gap="0">
+                                                                    <s-text fontWeight="medium">{details?.product?.title || 'Unknown Product'}</s-text>
+                                                                    <s-text tone="subdued">{details?.title || item.variantId}</s-text>
                                                                 </s-stack>
-                                                            </s-table-cell>
-                                                            <s-table-cell>{item.variantDetails?.title}</s-table-cell>
-                                                            <s-table-cell alignment="end">{item.quantity}</s-table-cell>
-                                                            <s-table-cell alignment="end">${(item.quantity * parseFloat(item.variantDetails?.price || 0)).toFixed(2)}</s-table-cell>
-                                                        </s-table-row>
-                                                    );
-                                                })}
-                                            </React.Fragment>
-                                        ))
-                                    ) : (
-                                        processedItems.map((item) => {
-                                            const details = item.variantDetails;
-                                            const imgUrl = details?.image?.url || details?.product?.featuredImage?.url;
-                                            return (
-                                                <s-table-row key={item.variantId}>
-                                                    <s-table-cell>
-                                                        <s-stack direction="inline" gap="base" align="center">
-                                                            {imgUrl ? (
-                                                                <img
-                                                                    src={imgUrl}
-                                                                    alt={details?.image?.altText || details?.product?.featuredImage?.altText || details?.title}
-                                                                    style={{ width: '45px', height: '45px', objectFit: 'cover', borderRadius: '4px' }}
-                                                                />
-                                                            ) : (
-                                                                <s-box width="45px" minHeight="45px" background="subdued" borderRadius="base" />
-                                                            )}
-                                                            <s-stack direction="block" gap="0">
-                                                                <s-text fontWeight="medium">{details?.product?.title || 'Unknown Product'}</s-text>
-                                                                <s-text tone="subdued">{details?.title || item.variantId}</s-text>
                                                             </s-stack>
-                                                        </s-stack>
-                                                    </s-table-cell>
-                                                    <s-table-cell>
-                                                        <s-stack direction="block" gap="none">
-                                                            {item.areaList.map((area, i) => (
-                                                                <s-text tone="subdued" key={i}>{area}</s-text>
-                                                            ))}
-                                                        </s-stack>
-                                                    </s-table-cell>
-                                                    <s-table-cell alignment="end">
-                                                        <s-text fontWeight="bold">{item.quantity}</s-text>
-                                                    </s-table-cell>
-                                                    <s-table-cell alignment="end">
-                                                        {details?.price ? `$${(item.quantity * parseFloat(details.price)).toFixed(2)}` : '-'}
-                                                    </s-table-cell>
-                                                </s-table-row>
-                                            );
-                                        })
-                                    )}
-                                    <s-table-row>
-                                        <s-table-cell>
-                                            <s-text fontWeight="bold">TOTAL:</s-text>
-                                        </s-table-cell>
-                                        <s-table-cell></s-table-cell>
-                                        <s-table-cell alignment="end">
-                                            <s-text fontWeight="bold" tone="success">{totalQty}</s-text>
-                                        </s-table-cell>
-                                        <s-table-cell alignment="end">
-                                            <s-text fontWeight="bold" tone="success">${totalPrice.toFixed(2)}</s-text>
-                                        </s-table-cell>
-                                    </s-table-row>
-                                </s-table-body>
-                            </s-table>
-                        </s-box>
-                    )}
+                                                        </s-table-cell>
+                                                        <s-table-cell>
+                                                            <s-stack direction="block" gap="none">
+                                                                {item.areaList.map((area, i) => (
+                                                                    <s-text tone="subdued" key={i}>{area}</s-text>
+                                                                ))}
+                                                            </s-stack>
+                                                        </s-table-cell>
+                                                        <s-table-cell alignment="end">
+                                                            <s-text fontWeight="bold">{item.quantity}</s-text>
+                                                        </s-table-cell>
+                                                        <s-table-cell alignment="end">
+                                                            {details?.price ? `$${(item.quantity * parseFloat(details.price)).toFixed(2)}` : '-'}
+                                                        </s-table-cell>
+                                                    </s-table-row>
+                                                );
+                                            })
+                                        )}
+                                        <s-table-row>
+                                            <s-table-cell>
+                                                <s-text fontWeight="bold">TOTAL:</s-text>
+                                            </s-table-cell>
+                                            <s-table-cell></s-table-cell>
+                                            <s-table-cell alignment="end">
+                                                <s-text fontWeight="bold" tone="success">{totalQty}</s-text>
+                                            </s-table-cell>
+                                            <s-table-cell alignment="end">
+                                                <s-text fontWeight="bold" tone="success">${totalPrice.toFixed(2)}</s-text>
+                                            </s-table-cell>
+                                        </s-table-row>
+                                    </s-table-body>
+                                </s-table>
+                            </s-box>
+                        )}
+                    </s-stack>
                 </s-stack>
             </s-section>
         </s-page>
