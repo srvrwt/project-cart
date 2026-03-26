@@ -159,7 +159,7 @@ export default function ProjectPage() {
                 <s-stack direction="block" gap="base">
 
                     <s-box paddingBlockEnd="400">
-                        <s-stack direction="inline" justify="space-between" align="space-between">
+                        <s-stack direction="inline" justify="space-between" align="center">
                             <s-button onClick={() => navigate("/app/projects")}>
                                 Back to Projects
                             </s-button>
