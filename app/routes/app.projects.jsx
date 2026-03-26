@@ -140,6 +140,10 @@ export default function ProjectsPage() {
                                             <s-table-cell>
                                                 {editId === p.id ? (
                                                     <s-stack direction="inline" gap="base">
+                                                        <s-button variant="secondary" onClick={() => setEditId(null)}>
+                                                            Cancel
+                                                        </s-button>
+
                                                         <s-button
                                                             variant="primary"
                                                             onClick={handleUpdate}
@@ -147,9 +151,7 @@ export default function ProjectsPage() {
                                                         >
                                                             Save
                                                         </s-button>
-                                                        <s-button variant="tertiary" onClick={() => setEditId(null)}>
-                                                            Cancel
-                                                        </s-button>
+
                                                     </s-stack>
                                                 ) : (
                                                     <s-stack direction="inline" gap="base">
