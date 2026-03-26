@@ -156,26 +156,28 @@ export default function ProjectPage() {
     return (
         <s-page heading={project.name}>
             <s-section>
-                <s-box paddingBlockEnd="400">
-                    <s-stack direction="inline" justify="space-between" align="center">
-                        <s-button onClick={() => navigate("/app/projects")}>
-                            Back to Projects
-                        </s-button>
-
-                        <s-stack direction="inline" gap="base" align="center">
-                            <s-text fontWeight="medium">Filter View:</s-text>
-                            <select 
-                                value={viewMode} 
-                                onChange={(e) => setViewMode(e.target.value)}
-                            >
-                                <option value="area">Area View</option>
-                                <option value="product">Product View</option>
-                            </select>
-                        </s-stack>
-                    </s-stack>
-                </s-box>
-
                 <s-stack direction="block" gap="base">
+
+                    <s-box paddingBlockEnd="400">
+                        <s-stack direction="inline" justify="space-between" align="space-between">
+                            <s-button onClick={() => navigate("/app/projects")}>
+                                Back to Projects
+                            </s-button>
+
+                            <s-stack direction="inline" gap="base" align="center">
+                                <s-text fontWeight="medium">Filter View:</s-text>
+                                <s-select
+                                    value={viewMode}
+                                    onChange={(e) => setViewMode(e.target.value)}
+                                >
+                                    <s-option value="area">Area View</s-option>
+                                    <s-option value="product">Product View</s-option>
+                                </a-select>
+                            </s-stack>
+                        </s-stack>
+                    </s-box>
+
+                    <s-stack direction="block" gap="base">
                         {itemsWithDetails.length === 0 ? (
                             <s-box padding="loose" textAlign="center">
                                 <s-paragraph>No products added to this project yet.</s-paragraph>
@@ -285,6 +287,7 @@ export default function ProjectPage() {
                             </s-box>
                         )}
                     </s-stack>
+                </s-stack>
             </s-section>
         </s-page>
     );
