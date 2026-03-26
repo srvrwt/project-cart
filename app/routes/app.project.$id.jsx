@@ -160,20 +160,22 @@ export default function ProjectPage() {
             </s-button>
 
             <s-section>
-                <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
-                    <button
-                        onClick={() => setViewMode("area")}
-                        style={{ padding: '8px 16px', borderRadius: '4px', border: '1px solid #c9cccf', background: viewMode === "area" ? "#008060" : "white", color: viewMode === "area" ? "white" : "#202223", cursor: 'pointer', fontWeight: 600 }}
-                    >
-                        Area View
-                    </button>
-                    <button
-                        onClick={() => setViewMode("product")}
-                        style={{ padding: '8px 16px', borderRadius: '4px', border: '1px solid #c9cccf', background: viewMode === "product" ? "#008060" : "white", color: viewMode === "product" ? "white" : "#202223", cursor: 'pointer', fontWeight: 600 }}
-                    >
-                        Product View
-                    </button>
-                </div>
+                <s-box paddingBlockEnd="400">
+                    <s-button-group>
+                        <s-button
+                            onClick={() => setViewMode("area")}
+                            {...(viewMode === "area" ? { variant: "primary" } : {})}
+                        >
+                            Area View
+                        </s-button>
+                        <s-button
+                            onClick={() => setViewMode("product")}
+                            {...(viewMode === "product" ? { variant: "primary" } : {})}
+                        >
+                            Product View
+                        </s-button>
+                    </s-button-group>
+                </s-box>
 
                 <s-stack direction="block" gap="base">
                     {itemsWithDetails.length === 0 ? (
@@ -181,100 +183,108 @@ export default function ProjectPage() {
                             <s-paragraph>No products added to this project yet.</s-paragraph>
                         </s-box>
                     ) : (
-                        <>
-                            <s-box borderWidth="base" borderRadius="base">
-                                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                    <thead style={{ position: 'sticky', top: 0, zIndex: 1 }}>
-                                        <tr style={{ background: '#f6f6f7', borderBottom: '1px solid #e1e3e5' }}>
-                                            <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: 'bold' }}>Product</th>
-                                            <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: 'bold' }}>{viewMode === "area" ? "Variant" : "Areas"}</th>
-                                            <th style={{ textAlign: 'right', padding: '12px 16px', fontWeight: 'bold' }}>Quantity</th>
-                                            <th style={{ textAlign: 'right', padding: '12px 16px', fontWeight: 'bold' }}>Price</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {viewMode === "area" ? (
-                                            processedItems.map((group) => (
-                                                <React.Fragment key={group.displayTitle}>
-                                                    <tr style={{ background: '#f9fafb', fontWeight: 'bold', borderBottom: '1px solid #e1e3e5' }}>
-                                                        <td colSpan="1" style={{ padding: '12px 16px', color: '#008060' }}>Area: {group.displayTitle}</td>
-                                                        <td style={{ padding: '12px 16px' }}></td>
-                                                        <td style={{ textAlign: 'right', padding: '12px 16px' }}>{group.totalQty}</td>
-                                                        <td style={{ textAlign: 'right', padding: '12px 16px' }}>${group.totalPrice.toFixed(2)}</td>
-                                                    </tr>
-                                                    {group.items.map(item => {
-                                                        const imgUrl = item.variantDetails?.image?.url || item.variantDetails?.product?.featuredImage?.url;
-                                                        return (
-                                                            <tr key={item.id} style={{ borderBottom: '1px solid #f1f2f3' }}>
-                                                                <td style={{ padding: '12px 16px' }}>
-                                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                                                        {imgUrl ? (
-                                                                            <img src={imgUrl} style={{ width: '40px', height: '40px', borderRadius: '4px', objectFit: 'cover' }} alt="" />
-                                                                        ) : (
-                                                                            <div style={{ width: '40px', height: '40px', background: '#f1f2f3', borderRadius: '4px' }} />
-                                                                        )}
-                                                                        <div>{item.variantDetails?.product?.title}</div>
-                                                                    </div>
-                                                                </td>
-                                                                <td style={{ padding: '12px 16px' }}>{item.variantDetails?.title}</td>
-                                                                <td style={{ textAlign: 'right', padding: '12px 16px' }}>{item.quantity}</td>
-                                                                <td style={{ textAlign: 'right', padding: '12px 16px' }}>${(item.quantity * parseFloat(item.variantDetails?.price || 0)).toFixed(2)}</td>
-                                                            </tr>
-                                                        );
-                                                    })}
-                                                </React.Fragment>
-                                            ))
-                                        ) : (
-                                            processedItems.map((item) => {
-                                                const details = item.variantDetails;
-                                                const imgUrl = details?.image?.url || details?.product?.featuredImage?.url;
-                                                return (
-                                                    <tr key={item.variantId} style={{ borderBottom: '1px solid #f1f2f3' }}>
-                                                        <td style={{ padding: '12px 16px' }}>
-                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                                                {imgUrl ? (
-                                                                    <img
-                                                                        src={imgUrl}
-                                                                        alt={details?.image?.altText || details?.product?.featuredImage?.altText || details?.title}
-                                                                        style={{ width: '45px', height: '45px', objectFit: 'cover', borderRadius: '4px' }}
-                                                                    />
-                                                                ) : (
-                                                                    <div style={{ width: '45px', height: '45px', background: '#f1f2f3', borderRadius: '4px' }} />
-                                                                )}
-                                                                <div>
-                                                                    <div style={{ fontWeight: '500' }}>{details?.product?.title || 'Unknown Product'}</div>
-                                                                    <div style={{ fontSize: '12px', color: '#6d7175' }}>{details?.title || item.variantId}</div>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td style={{ padding: '12px 16px', fontSize: '13px' }}>
-                                                            <div>
-                                                                {item.areaList.map((area, i) => (
-                                                                    <div key={i}>{area}</div>
-                                                                ))}
-                                                            </div>
-                                                        </td>
-                                                        <td style={{ textAlign: 'right', padding: '12px 16px', fontWeight: 'bold' }}>
-                                                            {item.quantity}
-                                                        </td>
-                                                        <td style={{ textAlign: 'right', padding: '12px 16px' }}>
-                                                            {details?.price ? `$${(item.quantity * parseFloat(details.price)).toFixed(2)}` : '-'}
-                                                        </td>
-                                                    </tr>
-                                                );
-                                            })
-                                        )}
-                                    </tbody>
-                                    <tfoot>
-                                        <tr style={{ background: '#f6f6f7', fontWeight: 'bold', borderTop: '2px solid #e1e3e5' }}>
-                                            <td colSpan="2" style={{ padding: '16px', textAlign: 'right', fontSize: '16px' }}>TOTAL:</td>
-                                            <td style={{ textAlign: 'right', padding: '16px', fontSize: '16px', color: '#008060' }}>{totalQty}</td>
-                                            <td style={{ textAlign: 'right', padding: '16px', fontSize: '16px', color: '#008060' }}>${totalPrice.toFixed(2)}</td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </s-box>
-                        </>
+                        <s-box borderWidth="base" borderRadius="base">
+                            <s-table>
+                                <s-table-header-row>
+                                    <s-table-header listSlot="primary">Product</s-table-header>
+                                    <s-table-header listSlot="inline">{viewMode === "area" ? "Variant" : "Areas"}</s-table-header>
+                                    <s-table-header listSlot="labeled" alignment="end">Quantity</s-table-header>
+                                    <s-table-header listSlot="labeled" alignment="end">Price</s-table-header>
+                                </s-table-header-row>
+                                
+                                <s-table-body>
+                                    {viewMode === "area" ? (
+                                        processedItems.map((group) => (
+                                            <React.Fragment key={group.displayTitle}>
+                                                <s-table-row>
+                                                    <s-table-cell tone="success">
+                                                        <s-text fontWeight="bold">Area: {group.displayTitle}</s-text>
+                                                    </s-table-cell>
+                                                    <s-table-cell></s-table-cell>
+                                                    <s-table-cell alignment="end">
+                                                        <s-text fontWeight="bold">{group.totalQty}</s-text>
+                                                    </s-table-cell>
+                                                    <s-table-cell alignment="end">
+                                                        <s-text fontWeight="bold">${group.totalPrice.toFixed(2)}</s-text>
+                                                    </s-table-cell>
+                                                </s-table-row>
+                                                {group.items.map(item => {
+                                                    const imgUrl = item.variantDetails?.image?.url || item.variantDetails?.product?.featuredImage?.url;
+                                                    return (
+                                                        <s-table-row key={item.id}>
+                                                            <s-table-cell>
+                                                                <s-stack direction="inline" gap="base" align="center">
+                                                                    {imgUrl ? (
+                                                                        <img src={imgUrl} style={{ width: '40px', height: '40px', borderRadius: '4px', objectFit: 'cover' }} alt="" />
+                                                                    ) : (
+                                                                        <s-box width="40px" minHeight="40px" background="subdued" borderRadius="base" />
+                                                                    )}
+                                                                    <s-text>{item.variantDetails?.product?.title}</s-text>
+                                                                </s-stack>
+                                                            </s-table-cell>
+                                                            <s-table-cell>{item.variantDetails?.title}</s-table-cell>
+                                                            <s-table-cell alignment="end">{item.quantity}</s-table-cell>
+                                                            <s-table-cell alignment="end">${(item.quantity * parseFloat(item.variantDetails?.price || 0)).toFixed(2)}</s-table-cell>
+                                                        </s-table-row>
+                                                    );
+                                                })}
+                                            </React.Fragment>
+                                        ))
+                                    ) : (
+                                        processedItems.map((item) => {
+                                            const details = item.variantDetails;
+                                            const imgUrl = details?.image?.url || details?.product?.featuredImage?.url;
+                                            return (
+                                                <s-table-row key={item.variantId}>
+                                                    <s-table-cell>
+                                                        <s-stack direction="inline" gap="base" align="center">
+                                                            {imgUrl ? (
+                                                                <img
+                                                                    src={imgUrl}
+                                                                    alt={details?.image?.altText || details?.product?.featuredImage?.altText || details?.title}
+                                                                    style={{ width: '45px', height: '45px', objectFit: 'cover', borderRadius: '4px' }}
+                                                                />
+                                                            ) : (
+                                                                <s-box width="45px" minHeight="45px" background="subdued" borderRadius="base" />
+                                                            )}
+                                                            <s-stack direction="block" gap="0">
+                                                                <s-text fontWeight="medium">{details?.product?.title || 'Unknown Product'}</s-text>
+                                                                <s-text tone="subdued">{details?.title || item.variantId}</s-text>
+                                                            </s-stack>
+                                                        </s-stack>
+                                                    </s-table-cell>
+                                                    <s-table-cell>
+                                                        <s-stack direction="block" gap="none">
+                                                            {item.areaList.map((area, i) => (
+                                                                <s-text tone="subdued" key={i}>{area}</s-text>
+                                                            ))}
+                                                        </s-stack>
+                                                    </s-table-cell>
+                                                    <s-table-cell alignment="end">
+                                                        <s-text fontWeight="bold">{item.quantity}</s-text>
+                                                    </s-table-cell>
+                                                    <s-table-cell alignment="end">
+                                                        {details?.price ? `$${(item.quantity * parseFloat(details.price)).toFixed(2)}` : '-'}
+                                                    </s-table-cell>
+                                                </s-table-row>
+                                            );
+                                        })
+                                    )}
+                                    <s-table-row>
+                                        <s-table-cell>
+                                            <s-text fontWeight="bold">TOTAL:</s-text>
+                                        </s-table-cell>
+                                        <s-table-cell></s-table-cell>
+                                        <s-table-cell alignment="end">
+                                            <s-text fontWeight="bold" tone="success">{totalQty}</s-text>
+                                        </s-table-cell>
+                                        <s-table-cell alignment="end">
+                                            <s-text fontWeight="bold" tone="success">${totalPrice.toFixed(2)}</s-text>
+                                        </s-table-cell>
+                                    </s-table-row>
+                                </s-table-body>
+                            </s-table>
+                        </s-box>
                     )}
                 </s-stack>
             </s-section>
