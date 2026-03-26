@@ -166,13 +166,13 @@ export default function ProjectPage() {
 
                             <s-stack direction="inline" gap="base" align="center">
                                 <s-text fontWeight="medium">Filter View:</s-text>
-                                <s-select
+                                <select
                                     value={viewMode}
                                     onChange={(e) => setViewMode(e.target.value)}
                                 >
-                                    <s-option value="area">Area View</s-option>
-                                    <s-option value="product">Product View</s-option>
-                                </a-select>
+                                    <option value="area">Area View</option>
+                                    <option value="product">Product View</option>
+                                </select>
                             </s-stack>
                         </s-stack>
                     </s-box>
