@@ -139,7 +139,7 @@ export default function ProjectsPage() {
                                             {/* Actions */}
                                             <s-table-cell>
                                                 {editId === p.id ? (
-                                                    <s-button-group>
+                                                    <s-stack direction="inline" gap="base">
                                                         <s-button
                                                             variant="primary"
                                                             onClick={handleUpdate}
@@ -150,9 +150,9 @@ export default function ProjectsPage() {
                                                         <s-button variant="tertiary" onClick={() => setEditId(null)}>
                                                             Cancel
                                                         </s-button>
-                                                    </s-button-group>
+                                                    </s-stack>
                                                 ) : (
-                                                    <s-button-group>
+                                                    <s-stack direction="inline" gap="base">
                                                         <s-button
                                                             icon="edit"
                                                             onClick={() => { setEditId(p.id); setEditName(p.name); }}
@@ -166,7 +166,7 @@ export default function ProjectsPage() {
                                                         >
                                                             Delete
                                                         </s-button>
-                                                    </s-button-group>
+                                                    </s-stack>
                                                 )}
                                             </s-table-cell>
 

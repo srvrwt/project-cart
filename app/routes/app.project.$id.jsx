@@ -161,7 +161,7 @@ export default function ProjectPage() {
 
             <s-section>
                 <s-box paddingBlockEnd="400">
-                    <s-button-group>
+                    <s-stack direction="inline" gap="base">
                         <s-button
                             onClick={() => setViewMode("area")}
                             {...(viewMode === "area" ? { variant: "primary" } : {})}
@@ -174,7 +174,7 @@ export default function ProjectPage() {
                         >
                             Product View
                         </s-button>
-                    </s-button-group>
+                    </s-stack>
                 </s-box>
 
                 <s-stack direction="block" gap="base">
