@@ -159,7 +159,7 @@ export default function ProjectPage() {
                 Back to Projects
             </s-button>
 
-            <s-section>
+            <s-section direction="block" gap="base">
                 <s-box paddingBlockEnd="400">
                     <s-stack direction="inline" gap="base">
                         <s-button
@@ -191,7 +191,7 @@ export default function ProjectPage() {
                                     <s-table-header listSlot="labeled" alignment="end">Quantity</s-table-header>
                                     <s-table-header listSlot="labeled" alignment="end">Price</s-table-header>
                                 </s-table-header-row>
-                                
+
                                 <s-table-body>
                                     {viewMode === "area" ? (
                                         processedItems.map((group) => (
