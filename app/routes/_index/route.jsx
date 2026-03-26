@@ -18,9 +18,9 @@ export default function App() {
   return (
     <div className={styles.index}>
       <div className={styles.content}>
-        <h1 className={styles.heading}>A short heading about [your app]</h1>
+        <h1 className={styles.heading}>Welcom to the Project Cart</h1>
         <p className={styles.text}>
-          A tagline about [your app] that describes your value proposition.
+          Project Cart is a simple and efficient way to manage your cart according to the projects.
         </p>
         {showForm && (
           <Form className={styles.form} method="post" action="/auth/login">
