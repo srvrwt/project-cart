@@ -145,7 +145,7 @@ export default function ProjectPage() {
                 <s-section>
                     <s-box padding="loose" textAlign="center">
                         <s-paragraph>The requested project could not be found.</s-paragraph>
-                        <s-button onClick={() => navigate("/app/projects")}>Back to Projects</s-button>
+                        <s-button onClick={() => navigate("/app/projects")}>Back</s-button>
                     </s-box>
                 </s-section>
             </s-page>
@@ -160,7 +160,7 @@ export default function ProjectPage() {
                     <s-box paddingBlockEnd="400">
                         <s-stack direction="inline" gap="base" justify="space-between" align="center">
                             <s-button onClick={() => navigate("/app/projects")}>
-                                Back to Projects
+                                Back
                             </s-button>
 
                             <s-stack direction="inline" gap="base" align="center">                                <s-select
