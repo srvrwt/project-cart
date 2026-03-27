@@ -4,7 +4,7 @@ import prisma from "../db.server";
 import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }) => {
-    await authenticate.admin(request);
+    const { session } = await authenticate.admin(request);
     const projects = await prisma.project.findMany({
         orderBy: { createdAt: "desc" },
         include: {
@@ -21,18 +21,43 @@ export const loader = async ({ request }) => {
         };
     });
 
-    return { projects: projectsWithStats };
+    return { projects: projectsWithStats, shop: session.shop };
 };
 
 export default function ProjectsPage() {
-    const { projects } = useLoaderData();
+    const { projects, shop } = useLoaderData();
     const fetcher = useFetcher();
     const navigate = useNavigate();
     const [name, setName] = useState("");
     const [editId, setEditId] = useState(null);
     const [editName, setEditName] = useState("");
+    const [copiedId, setCopiedId] = useState(null);
 
     const isLoading = fetcher.state !== "idle";
+
+    const handleCopyCartLink = (project) => {
+        if (!project.items || project.items.length === 0) {
+            return alert("This project has no products.");
+        }
+
+        const variantTotals = {};
+        project.items.forEach(item => {
+            const vid = String(item.variantId).replace("gid://shopify/ProductVariant/", "");
+            variantTotals[vid] = (variantTotals[vid] || 0) + item.quantity;
+        });
+
+        const query = new URLSearchParams();
+        Object.entries(variantTotals).forEach(([id, qty]) => {
+            query.append(`updates[${id}]`, qty);
+        });
+
+        const cartUrl = `https://${shop}/cart/update?${query.toString()}`;
+
+        navigator.clipboard.writeText(cartUrl).then(() => {
+            setCopiedId(project.id);
+            setTimeout(() => setCopiedId(null), 2000);
+        });
+    };
 
     useEffect(() => {
         if (fetcher.state === "idle" && fetcher.data) {
@@ -155,6 +180,13 @@ export default function ProjectsPage() {
                                                     </s-stack>
                                                 ) : (
                                                     <s-stack direction="inline" gap="base">
+                                                        <s-button
+                                                            icon={copiedId === p.id ? "checkmark" : "link"}
+                                                            onClick={() => handleCopyCartLink(p)}
+                                                            tone={copiedId === p.id ? "success" : undefined}
+                                                        >
+                                                            {copiedId === p.id ? "Copied" : "Copy Link"}
+                                                        </s-button>
                                                         <s-button
                                                             icon="edit"
                                                             onClick={() => { setEditId(p.id); setEditName(p.name); }}
