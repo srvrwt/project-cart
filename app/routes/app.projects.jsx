@@ -75,7 +75,7 @@ export default function ProjectsPage() {
             <s-section heading="All Projects">
                 <s-stack direction="block" gap="base">
                     <s-box padding="base" borderWidth="base" borderRadius="base" background="subdued">
-                        <s-stack direction="inline" gap="base" align="center">
+                        <s-stack direction="inline" gap="base" align="center" justifyContent="space-between">
                             <s-text-field
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}

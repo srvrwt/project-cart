@@ -74,7 +74,6 @@ export const loader = async ({ request, params }) => {
         return { project, itemsWithDetails };
     } catch (error) {
         console.error("Error fetching variant details:", error);
-        // Return project with items but no variant details as fallback
         return {
             project,
             itemsWithDetails: project.items.map(item => ({ ...item, variantDetails: null }))
@@ -106,7 +105,7 @@ export default function ProjectPage() {
                     grouped[variantId] = {
                         ...item,
                         quantity: 0,
-                        areaMap: {} // { "Lounge": 5, "Office": 10 }
+                        areaMap: {}
                     };
                 }
                 grouped[variantId].quantity += item.quantity;
