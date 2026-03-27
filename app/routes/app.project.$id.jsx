@@ -4,7 +4,7 @@ import db from "../db.server";
 import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request, params }) => {
-    const { admin, session } = await authenticate.admin(request);
+    const { admin } = await authenticate.admin(request);
 
     const project = await db.project.findUnique({
         where: { id: params.id },
@@ -22,7 +22,7 @@ export const loader = async ({ request, params }) => {
     }))];
 
     if (variantIds.length === 0) {
-        return { project, itemsWithDetails: [], shop: session.shop };
+        return { project, itemsWithDetails: [] };
     }
 
     try {
@@ -71,46 +71,21 @@ export const loader = async ({ request, params }) => {
                 variantDetails: variant || null
             };
         });
-        return { project, itemsWithDetails, shop: session.shop };
+        return { project, itemsWithDetails };
     } catch (error) {
         console.error("Error fetching variant details:", error);
         // Return project with items but no variant details as fallback
         return {
             project,
-            itemsWithDetails: project.items.map(item => ({ ...item, variantDetails: null })),
-            shop: session?.shop || ""
+            itemsWithDetails: project.items.map(item => ({ ...item, variantDetails: null }))
         };
     }
 };
 
 export default function ProjectPage() {
-    const { project, itemsWithDetails, shop } = useLoaderData();
+    const { project, itemsWithDetails } = useLoaderData();
     const navigate = useNavigate();
     const [viewMode, setViewMode] = useState("area"); // "product", "area"
-    const [copied, setCopied] = useState(false);
-
-    const handleCopyCartLink = () => {
-        if (!itemsWithDetails || itemsWithDetails.length === 0) return;
-        
-        // Group items by variantId to sum quantities
-        const variantTotals = {};
-        itemsWithDetails.forEach(item => {
-            const vid = String(item.variantId).replace("gid://shopify/ProductVariant/", "");
-            variantTotals[vid] = (variantTotals[vid] || 0) + item.quantity;
-        });
-
-        const query = new URLSearchParams();
-        Object.entries(variantTotals).forEach(([id, qty]) => {
-            query.append(`updates[${id}]`, qty);
-        });
-
-        const cartUrl = `https://${shop}/cart/update?${query.toString()}`;
-
-        navigator.clipboard.writeText(cartUrl).then(() => {
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        });
-    };
 
     const { processedItems, totalQty, totalPrice } = useMemo(() => {
         let items = [];
@@ -189,21 +164,13 @@ export default function ProjectPage() {
                                 Back to Projects
                             </s-button>
 
-                            <s-stack direction="inline" gap="base" align="center">
-                                <s-button 
-                                    onClick={handleCopyCartLink}
-                                    icon={copied ? "checkmark" : "link"}
-                                    tone={copied ? "success" : undefined}
-                                >
-                                    {copied ? "Link Copied!" : "Copy Cart Link"}
-                                </s-button>
-                                <s-select
-                                    value={viewMode}
-                                    onChange={(e) => setViewMode(e.target.value)}
-                                >
-                                    <s-option value="area">Area View</s-option>
-                                    <s-option value="product">Product View</s-option>
-                                </s-select>
+                            <s-stack direction="inline" gap="base" align="center">                                <s-select
+                                value={viewMode}
+                                onChange={(e) => setViewMode(e.target.value)}
+                            >
+                                <s-option value="area">Area View</s-option>
+                                <s-option value="product">Product View</s-option>
+                            </s-select>
                             </s-stack>
                         </s-stack>
                     </s-box>
